@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Gold & Currency Tracker</title>
+  <style>
+    body {
+      width: 400px;
+      padding: 20px;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      margin: 0;
+      background-color: #f8f9fa;
+    }
+    .container {
+      background-color: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #f0f0f0;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 24px;
+      color: #1a1a1a;
+      font-weight: 600;
+    }
+    .section {
+      margin-bottom: 20px;
+      padding: 15px;
+      background: #f8f9fa;
+      border-radius: 10px;
+      transition: transform 0.2s;
+    }
+    .section:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    }
+    .title {
+      font-weight: 600;
+      color: #2c3e50;
+      margin-bottom: 12px;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+    }
+    .title::before {
+      content: '';
+      display: inline-block;
+      width: 4px;
+      height: 16px;
+      background: #ffd700;
+      margin-right: 8px;
+      border-radius: 2px;
+    }
+    .price-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #eee;
+    }
+    .price-row:last-child {
+      border-bottom: none;
+    }
+    .price {
+      font-size: 16px;
+      color: #333;
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .change {
+      font-size: 14px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+    }
+    .increase {
+      color: #00a854;
+      background-color: #f6ffed;
+    }
+    .decrease {
+      color: #f5222d;
+      background-color: #fff1f0;
+    }
+    .currency-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .currency-card {
+      background: white;
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      border: 1px solid #eee;
+      transition: transform 0.2s;
+    }
+    .currency-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+    .currency-label {
+      margin-bottom: 8px;
+      color: #666;
+      font-size: 14px;
+    }
+    .last-updated {
+      font-size: 12px;
+      color: #666;
+      text-align: center;
+      margin-top: 15px;
+      font-style: italic;
+    }
+    .currency-name {
+      font-weight: 500;
+      color: #666;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Gold & Currency Tracker</h1>
+    </div>
+
+    <div class="section">
+      <div class="title">24K Gold Prices</div>
+      <div class="price-row">
+        <span class="currency-name">Indian Rupee:</span>
+        <div id="24k_inr" class="price">Loading...</div>
+      </div>
+      <div class="price-row">
+        <span class="currency-name">UAE Dirham:</span>
+        <div id="24k_aed" class="price">Loading...</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="title">22K Gold Prices</div>
+      <div class="price-row">
+        <span class="currency-name">Indian Rupee:</span>
+        <div id="22k_inr" class="price">Loading...</div>
+      </div>
+      <div class="price-row">
+        <span class="currency-name">UAE Dirham:</span>
+        <div id="22k_aed" class="price">Loading...</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="title">18K Gold Prices</div>
+      <div class="price-row">
+        <span class="currency-name">Indian Rupee:</span>
+        <div id="18k_inr" class="price">Loading...</div>
+      </div>
+      <div class="price-row">
+        <span class="currency-name">UAE Dirham:</span>
+        <div id="18k_aed" class="price">Loading...</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="title">Exchange Rates</div>
+      <div class="currency-section">
+        <div class="currency-card">
+          <div class="currency-label">USD to INR</div>
+          <div id="usdToInr" class="price">Loading...</div>
+        </div>
+        <div class="currency-card">
+          <div class="currency-label">AED to INR</div>
+          <div id="aedToInr" class="price">Loading...</div>
+        </div>
+      </div>
+    </div>
+
+    <div id="lastUpdated" class="last-updated">Last updated: --</div>
+  </div>
+  <script src="config.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html> 
