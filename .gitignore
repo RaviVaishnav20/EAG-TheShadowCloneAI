@@ -109,3 +109,5 @@ venv/
 
 # Cython debug symbols
 cython_debug/
+
+config.js
