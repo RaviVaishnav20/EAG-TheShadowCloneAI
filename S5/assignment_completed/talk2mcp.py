@@ -86,7 +86,7 @@ async def main():
         print("Establishing connection to MCP server...")
         server_params = StdioServerParameters(
             command="python",
-            args=[r"C:\Users\raviv\Documents\gitRepos\EAG-TheShadowCloneAI\S5\assignment_completed\example3.py"]
+            args=[r"C:\Users\raviv\Documents\gitRepos\EAG-TheShadowCloneAI\S5\assignment_completed\example2.py"]
         )
 
         async with stdio_client(server_params) as (read, write):
@@ -145,52 +145,64 @@ async def main():
                 print("Created system prompt...")
                 
                 # In talk2mcp.py, modify the system prompt:
+                system_prompt = f"""You are a dual-capability agent that performs both mathematical computations and visual diagramming tasks.
 
-                system_prompt = f"""You are a tool-using agent capable of performing both computational tasks and visual editing actions.
+Your task flow must follow this strict reasoning and execution structure:
 
-your task flow should follow these three-part reasoning and execution structure.
+1. THINK: Analyze the task requirements
+   - For math: Identify formulas/theorems needed (e.g. kinematics, algebra)
+   - For visuals: Determine diagram components (e.g. shapes, labels)
+   - Example: THINK: This projectile problem requires range calculation and trajectory visualization
 
-1. THINK: Before issuing any action, analyze the task.
-   - Identify what kind of reasoning is required (e.g. arithmetic, spatial, logical)
-   - Clearly articulate your reasoning in a single line beginning with THINK:.
-   - Example: THINK: This is a spatial task requiring a rectangle and label.
+2. VERIFY: Validate parameters and workflow
+   - Math: Check unit consistency and value ranges
+   - Visual: Confirm coordinates are within bounds (x:100-900, y:300-700)
+   - Example: VERIFY: Launch velocity=20m/s is physically reasonable
 
-2. VERIFY: Perform internal self-checks.
-   - Ensure function parameters (e.g., coordinates, dimensions) are valid.
-   - Validate logical order (e.g., initialization or opening paint before drawing)
-   - Output a single line beginning with VERIFY:, VERIFY: Coordinates within bounds and correct sequence.
+3. ACT: Execute exactly ONE action per cycle:
+   - Math: FUNCTION_CALL: {{"name": "math_function", "args": {{...}}}}
+   - Visual: 
+     1. Initialize: FUNCTION_CALL: {{"name": "open_paint", "args": {{}}}}
+     2. Draw: FUNCTION_CALL: {{"name": "draw_rectangle", "args": {{...}}}}
+   - Final output: FINAL_ANSWER: [result]
 
-3. ACT: Respond with EXACTLY ONE action line, formatted as:
-   - Respond with exactly one action in the following formats:  
-   - For computational tasks:  
-     - FUNCTION_CALL: {{"name": "function_name", "args": {{"param1": value, "param2": value}}}}  
-     - FINAL_ANSWER: [result] 
-   - For visual tasks:  
-     - Initialize first: FUNCTION_CALL: {{"name": "open_editor", "args": {{}}}}  
-     - Then perform actions (e.g., FUNCTION_CALL: {{"name": "draw_rectangle", "args": {{"x1": 100, "y1": 200, "x2": 300, "y2": 400}}}}).  
-     - Optionally add text: FUNCTION_CALL: {{"name": "add_text", "args": {{"text": "Label", "x": 150, "y": 250}}}}.  
+Available Tools:
+{tools_description}
 
-Available Tools  
-  
-{tools_description} 
+Strict Rules:
+1. Math-Specific:
+   - Always include units in FINAL_ANSWER
+   - Validate input ranges (e.g. mass > 0)
+   - Use appropriate precision (3 decimal places)
 
-Rules & Constraints  
-✅ Strict Formatting:  
-   - Only FUNCTION_CALL:, or FINAL_ANSWER: lines.  
-   - One action per response (unless pre-validated with THINK/VERIFY). 
-   - Last action response should be FINAL_ANSWER
+2. Visual-Specific:
+   - Must call open_paint before any drawing
+   - Keep elements centered (x:100-900, y:300-700)
+   - Text must fit within shapes
 
-✅ Visual Workflow:  
-   - Always initialize (e.g., open_editor) before drawing.  
-   - Use appropriate coordinate values (e.g., x between 100–900 and y between 300-700) and position text **inside shapes**
+3. Universal:
+   - One action per THINK-VERIFY-ACT cycle
+   - Final output must be FINAL_ANSWER
+   - Handle errors explicitly:
+     - ERROR: Invalid parameters when validation fails
+     - ERROR: Missing initialization for visual tasks
 
+Example Workflows:
 
-✅ Error Handling:  
-   - If uncertain: THINK: I need clarification on [task].  
-   - If invalid: FINAL_ANSWER: [error: invalid parameters].
-   """
+Computation task Example:
+THINK: Need to calculate projectile range using R = (v₀² sin2θ)/g
+VERIFY: Velocity=20m/s and angle=45° are valid inputs
+FUNCTION_CALL: {{"name": "horizontal_range", "args": {{"v0": 20, "angle": 45}}}}  
+FINAL_ANSWER: 40.8 meters
 
-
+Visual task Example:
+THINK: Need to diagram a 300×200 rectangle labeled "Projectile"
+VERIFY: Coordinates (400,400)→(700,600) are within bounds
+FUNCTION_CALL: {{"name": "open_paint", "args": {{}}}}
+FUNCTION_CALL: {{"name": "draw_rectangle", "args": {{"x1":400,"y1":400,"x2":700,"y2":600}}}}
+FUNCTION_CALL: {{"name": "add_text_in_paint", "args": {{"text":"Projectile","x":550,"y":500}}}}
+FINAL_ANSWER: Diagram complete
+"""
 
 # Change the query to:
                 # query = """Open Microsoft Paint, draw a rectangle, and add the text "AI Agent Demo" inside the rectangle."""
@@ -199,7 +211,10 @@ Rules & Constraints
                 # query = """Find the area under the curve of e to the power of negative x squared between x equals 0 and 1.""" 
                 # query = """Solve the differential equation dy/dx equals negative x times y with initial condition y(0)=1, from x=0 to x=2.""" 
                 # query = """Multiply these two matrices for me: [[1,2],[3,4]] and [[5,6],[7,8]]."""
-                query = """Find where the function x cubed minus x minus 2 crosses zero, starting with an initial guess of 1."""
+                # query = """Find where the function x cubed minus x minus 2 crosses zero, starting with an initial guess of 1."""
+                # query = """A 0.5 kg ball is thrown at 20 m/s at a 30° angle. What is its kinetic energy at launch and its maximum horizontal range?"""
+                # query = """A police car moving at 40 m/s fires a radar gun (f₀=24 GHz) while launching a tear gas canister at 50 m/s at 25°. Calculate both the Doppler-shifted radar frequency and the canister's range."""
+                query = """A 1200 kg car braking at -8 m/s² for 3 seconds before hitting a barrier. What was its initial kinetic energy and how far did it travel during braking?"""
                 print("Starting iteration loop...")
                 
                 # Use global iteration variables
