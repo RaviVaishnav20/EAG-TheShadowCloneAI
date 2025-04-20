@@ -111,3 +111,5 @@ venv/
 cython_debug/
 
 config.js
+
+logs.json
