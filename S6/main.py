@@ -13,7 +13,6 @@ from perception import extract_perception
 logger = get_logger()
 
 max_iterations = 5
-# last_response = None
 iteration = 0
 iteration_response = []
 user_id = "ravi123"
@@ -41,12 +40,13 @@ async def main():
                 tools = tools_result.tools
                 logger.info(f"Successfully retrieved {len(tools)} tools")
                 
-                logger.info("Started creating tools discription prompt...")
+                logger.info("Started creating tools description prompt...")
                 tools_description = get_tools_prompt(tools)
-                logger.info("Created tools discription prompt...")
+                # print(tools_description)
+                logger.info("Created tools description prompt...")
                 
-                # query = """Open Microsoft Paint, draw a rectangle, and add the text "AI Agent Demo" above the rectangle."""
-                query = """A 1200 kg car braking at -8 m/s² for 3 seconds before hitting a barrier. What was its initial kinetic energy and how far did it travel during braking?"""
+                query = """Open Microsoft Paint, draw a rectangle, and add the text "AI Agent Demo" above the rectangle."""
+                # query = """A 1200 kg car braking at -8 m/s² for 3 seconds before hitting a barrier. What was its initial kinetic energy and how far did it travel during braking?"""
                 query = await extract_perception(PerceptionInput(query=query))
                 logger.info("Starting iteration loop...")
 
@@ -57,7 +57,7 @@ async def main():
                     chat_history = get_short_term_memory(GetSTMemoryInput(key=user_id))
                     last_response = get_last_response(GetSTMemoryInput(key=user_id))
                     
-                    query =  query + "\n\n" + "last operation was:"+"\n\n" + last_response
+                    query = query + "\n\n" + "last operation was:"+"\n\n" + last_response
                     input_decision = DECISION_INPUT(
                         query=query, 
                         chat_history=chat_history, 
@@ -78,15 +78,12 @@ async def main():
                             break
                         
                     if response_text.startswith("FUNCTION_CALL:"):
-                        # _, function_info = response_text.split(":", 1)
-                        # parts = [p.strip() for p in function_info.split("|")]
-                        # func_name, params = parts[0], parts[1:]
                         function_info = extract_function_call(response_text)
-                        logger.debug(f"Extrected function info: {function_info}")
+                        logger.debug(f"Extracted function info: {function_info}")
                         func_name = function_info['name']
-                        params = list(function_info['args'].values())
+                        args = function_info['args']
                         logger.debug(f"Function name: {func_name}")
-                        logger.debug(f"Raw parameters: {params}")
+                        logger.debug(f"Arguments: {args}")
                         
                         try:
                             # Find the matching tool to get its input schema
@@ -101,29 +98,31 @@ async def main():
 
                             # Prepare arguments according to the tool's input schema
                             arguments = {}
-                            schema_properties = tool.inputSchema.get('properties', {})
-                            logger.debug(f"Schema properties: {schema_properties}")
-
-                            for param_name, param_info in schema_properties.items():
-                                if not params:  # Check if we have enough parameters
-                                    logger.error(f"Not enough parameters provided for {func_name}")
-                                    raise ValueError(f"Not enough parameters provided for {func_name}")
-                                    
-                                value = params.pop(0)  # Get and remove the first parameter
-                                param_type = param_info.get('type', 'string')
-                                
-                                logger.debug(f"Converting parameter {param_name} with value {value} to type {param_type}")
-                                
-                                # Convert the value to the correct type based on the schema
-                                if param_type == 'integer':
-                                    arguments[param_name] = int(value)
-                                elif param_type == 'number':
-                                    arguments[param_name] = float(value)
-                                elif param_type == 'array':
-                                    arguments[param_name] = list(value)
+                            
+                            # Handle Pydantic class structure for arguments
+                            if args:
+                                # If the tool takes no inputs (like open_paint), keep arguments empty
+                                if len(args) == 0:
+                                    arguments = {}
                                 else:
-                                    arguments[param_name] = str(value)
-
+                                    # For Pydantic class inputs:
+                                    # Function expects a single parameter (like input_data)
+                                    # But we get the class name (like BinaryOperationInput) and its contents
+                                    # We need to extract the first (and only) class and use its contents as input_data
+                                    
+                                    # Get the first key (Pydantic class name) and its value (the actual parameters)
+                                    class_name = next(iter(args))
+                                    class_params = args[class_name]
+                                    
+                                    # Check if the tool schema has properties in the root
+                                    if 'properties' in tool.inputSchema:
+                                        # Most likely there's an input_data parameter
+                                        input_param_name = next(iter(tool.inputSchema['properties']))
+                                        arguments[input_param_name] = class_params
+                                    else:
+                                        # Fallback: just pass the parameters directly
+                                        arguments = class_params
+                            
                             logger.debug(f"Final arguments: {arguments}")
                             logger.info(f"Calling tool {func_name}")
                             
@@ -167,8 +166,8 @@ async def main():
 
                     elif response_text.startswith("FINAL_ANSWER"):
                         logger.info("\n=== Agent Execution Complete ===")
-                        
-                        print(result.content[0].text)
+                        final_answer = response_text.split('FINAL_ANSWER:')[1].strip()
+                        print(f"Final Answer: {final_answer}")
                         break
 
                     iteration += 1
