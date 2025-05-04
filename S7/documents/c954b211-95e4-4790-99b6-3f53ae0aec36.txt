@@ -1,0 +1,209 @@
+Blog / The MLFlow-Airflow-Kubernetes Makeshift Monster: How Your DIY ML Stack Became Your
+Biggest Bottleneck
+The MLFlow-Airflow-
+Kubernetes Makeshift
+Monster: How Your DIY ML
+Stack Became Your Biggest
+Bottleneck
+by Drazen Dodik | on April 28, 2025
+Ever watched a horror movie where the scientist creates a monster with the best
+intentions? That's the ML infrastructure story playing out in companies
+everywhere today.
+5/4/25, 8:58 PM The MLFlow-Airflow-Kubernetes Makeshift Monster: How Your DIY ML Stack Became Your Biggest Bottleneck
+https://valohai.com/blog/the-mlflow-airflow-kubernets-makeshift-monster/ 1/9
+It All Starts With Good Intentions
+Your team begins with basic needs. Version control? Git. Experiment tracking?
+MLflow. Need to scale? Maybe SageMaker or a Kubernetes cluster because
+someone on the team thinks it "sounds fun." (Spoiler: managing Kubernetes is
+many things, but "fun" isn't one of them.)
+Each decision makes perfect sense when viewed in isolation. But soon, your tool
+sprawl grows out of control:
+One team prefers MLflow, another adopts Weights & Biases
+You need to separate projects between teams, so now you're maintaining multiple MLflow
+instances
+Your orchestration tool forces you to completely rewrite code with special decorators and
+platform-specific patterns
+Finding and fixing issues becomes nearly impossible when jobs run across various environments,
+tools and dashboards
+Every dataset version lives in its own world, with no clear connection to the models trained on it
+Pretty soon, your team isn't building models—they're gluing together tools, writing
+custom integrations, and maintaining a patchwork of systems just to keep things
+running.
+The Hidden Business Costs You Can't
+Ignore
+This isn't just a technical nuisance. It's actively hurting your business in ways that
+might not show up clearly on a dashboard but are devastatingly real:
+Productivity Drain: Data scientists spend hours or even days recreating past runs
+because they can't easily find or reproduce previous experiments. "Which version
+of the data did I use again? Where did I save those parameters?"
+Resource Waste: Infrastructure sits idle or runs at the wrong size because nobody
+has visibility across systems. You're paying premium prices for GPU instances that
+might be running at 15% utilization.
+5/4/25, 8:58 PM The MLFlow-Airflow-Kubernetes Makeshift Monster: How Your DIY ML Stack Became Your Biggest Bottleneck
+https://valohai.com/blog/the-mlflow-airflow-kubernets-makeshift-monster/ 2/9
+All-Hands Debugging Sessions: When something breaks in production, it takes the
+entire team to figure out what went wrong. One person checks pipeline logs,
+another investigates the data sources, a third verifies the infrastructure, and a
+fourth tries to determine if it was a code change or parameter tweak that broke
+things.
+Communication Overhead: Team members spend excessive time explaining their
+work to each other because there's no shared source of truth. "No, I used that
+version of the model with this dataset on those parameters…and oh yeah, I had to
+change this Docker configuration"
+Onboarding Paralysis: New team members take months to become productive. As
+one VP told me, "I have a dream where data scientists don't become integration
+engineers—they're productive on Day 1." Instead, they waste weeks mastering your
+custom tool soup rather than building models that matter.
+The Hidden Vulnerability: Your ML
+Stack's Dangerous Bus Factor
+Every DIY ML stack eventually creates its "tribal knowledge keepers"—those few
+team members who truly understand how everything fits together. Maybe they're
+the ones who stitched together MLflow with Airflow using a combination of Bash
+scripts, Python glue code, and sheer determination. Or perhaps they're the only
+ones who can explain how model versioning actually works when you're running
+retraining from a cron job inside a Kubernetes cluster.
+At first, this person is a hero. The go-to expert. The team's Rosetta Stone for
+translating between Terraform configs, pipeline YAMLs, and Dockerfiles.
+But over time, the hero's cape starts to feel unbearably heavy.
+They're pulled into every debugging session. Asked to unblock every new hire's
+onboarding. Pinged at all hours for tribal knowledge that was never documented
+because, well, there was never time. And when they finally take a vacation—or
+worse, leave the company—your entire ML operation teeters like a Jenga tower
+after one too many bad moves.
+Even if they are still around, the costs silently accumulate:
+5/4/25, 8:58 PM The MLFlow-Airflow-Kubernetes Makeshift Monster: How Your DIY ML Stack Became Your Biggest Bottleneck
+https://valohai.com/blog/the-mlflow-airflow-kubernets-makeshift-monster/ 3/9
+Velocity grinds to a halt because work piles up behind one or two knowledge gatekeepers
+Morale plummets as those experts burn out from being the default 24/7 help desk
+Resentment builds when newer team members feel like they're navigating a maze where someone
+keeps moving the walls
+You didn't hire brilliant machine learning engineers to babysit pipeline
+configurations and personally train every new joiner on your homegrown
+infrastructure. But without proper abstraction, documentation, and unified
+platform support, that's exactly what they become—glorified integration support
+specialists rather than ML pioneers.
+The Real Casualty: Experimentation
+Paralysis
+Your team doesn't stop experimenting—they just bypass your infrastructure
+entirely. When connecting to environments, orchestrating jobs, and tracking
+results requires serious effort across multiple systems, they retreat to their local
+machines. The result? Fewer iterations, safer choices, and valuable insights lost to
+"shadow ML" that never makes it into your official systems.
+When Production Issues Strike
+The real nightmare happens when production issues arise. Instead of quickly
+identifying and fixing the problem, you need:
+Someone to check the pipeline logs in system Airflow
+Someone else to investigate the data in AWS S3
+A third person to verify the compute infrastructure in AWS EC2
+A fourth to determine if the issue was caused by a code change or a parameter change through
+MLFlow
+By the time you've diagnosed the issue, you've burned days of collective
+engineering time and delayed critical fixes. With each person only understanding
+their specific piece of the puzzle, you're seeing:
+Critical ML projects stalled by resource or expertise bottlenecks
+Production models failing without clear warning signs
+5/4/25, 8:58 PM The MLFlow-Airflow-Kubernetes Makeshift Monster: How Your DIY ML Stack Became Your Biggest Bottleneck
+https://valohai.com/blog/the-mlflow-airflow-kubernets-makeshift-monster/ 4/9
+Teams forced to start from scratch because they can't reproduce previous work
+Workarounds and security gaps as teams try to sidestep limitations
+What Good Actually Looks Like
+A unified ML platform shouldn't require your team to become infrastructure
+experts. It should:
+Work with minimal code changes (you shouldn't need to completely rewrite code with special
+decorators or platform-specific patterns)
+Reduce compute costs by surfacing GPU usage metrics, empowering teams to optimize resource
+allocation naturally without becoming infrastructure experts
+Enable both one-click and programmatic model promotion with automated tracking
+Manage all ML environments from a single interface
+Provide intelligent orchestration with unified control
+The ideal platform fades into the background—it's infrastructure that enables
+rather than distracts.
+Breaking Free of Your Homemade
+Monster
+You don't need to throw everything away and start over. But it's worth stepping
+back to assess honestly: is your tool stack serving your team, or is your team
+serving the tool stack?
+If your engineers are spending more time maintaining connections between
+systems, figuring out how to access the right logs, tracking down the right metrics,
+or managing job orchestration than actually building models—you've created a
+monster.
+A Better Way Forward
+Oh, shocker. It's a Valohai blog promoting Valohai. All the points above make sense
+no matter what MLOps solution you choose, but I genuinely believe Valohai offers
+5/4/25, 8:58 PM The MLFlow-Airflow-Kubernetes Makeshift Monster: How Your DIY ML Stack Became Your Biggest Bottleneck
+https://valohai.com/blog/the-mlflow-airflow-kubernets-makeshift-monster/ 5/9
+the best path forward:
+Accelerated delivery: Cut project setup time with pre-built templates and slash time-to-
+production
+Cost optimization: Eliminate redundant runs with automatic experiment detection and job reuse
+Resource efficiency: Surface real-time GPU usage metrics that enable teams to naturally optimize
+resource allocation
+Team onboarding: Get new data scientists productive in days rather than weeks with minimal
+platform-specific knowledge
+Seamless debugging: Track every decision from data to model with complete lineage and robust
+traceability (and with the ability to attach a debugger, yesss!)
+Infrastructure flexibility: Deploy anywhere with the same workflow—cloud, on-prem, or hybrid
+environments
+No Bulldozers Needed: Upgrading
+Without Starting From Scratch
+You're thinking: "We've spent years building this stack. Migrating sounds like
+setting cash on fire."
+I get it. But escaping your homemade ML monster doesn't require a scorched-
+earth approach.
+Valohai doesn't force you to rewrite your codebase with some proprietary SDK. No
+magical decorators. No mysteries on “is it me, or Valohai?”
+Instead, Valohai aims to adapt to your existing workflow. Your existing scripts?
+Keep them. Folder organization? Just as you like it. The difference? Everything
+suddenly has lineage, automation, and reproducibility—without the duct tape and
+prayers/crystals.
+Still skeptical? I would too after battling MLflow-Airflow-Kubernetes integration
+hell.
+So here's my challenge: give our team two hours. That's it. (I mean, I'll need a brief
+first on what your project is and how it's structured. I'm not a mind reader… yet!)
+Two hours on a screenshare, and together we’ll live-code migrate your first job and
+pipeline into Valohai. No sleight of hand. Just your actual workflows made instantly
+5/4/25, 8:58 PM The MLFlow-Airflow-Kubernetes Makeshift Monster: How Your DIY ML Stack Became Your Biggest Bottleneck
+https://valohai.com/blog/the-mlflow-airflow-kubernets-makeshift-monster/ 6/9
+traceable.
+Don't believe it? Test me. Book a demo and  join us for a different kind of ML
+infrastructure experience. Your future self (and  your sanity) will thank you.
+I have read and agree to Valohai's privacy policy.
+5/4/25, 8:58 PM The MLFlow-Airflow-Kubernetes Makeshift Monster: How Your DIY ML Stack Became Your Biggest Bottleneck
+https://valohai.com/blog/the-mlflow-airflow-kubernets-makeshift-monster/ 7/9
+The Hidden Reproducibility Crisis Killing Your ML Team's Productivity (And Your Budget)
+Drazen Dodik / April 30, 2025
+How to manage massive datasets in Valohai
+Tomi Kokkonen / February 19, 2025
+2024 in Review (Part 1)
+Tarek Oraby / December 18, 2024
+Boosting Velocity in Data Science Teams: A Practical Guide
+Tarek Oraby / November 27, 2024
+Stop wasting your GPUs with Valohai's Dynamic GPU Allocation
+Tarek Oraby / November 20, 2024
+Valohai's Audit Log: Traceability built for AI governance
+Tarek Oraby / November 06, 2024
+AMD GPU Performance for LLM Inference: A Deep Dive
+Eero Laaksonen / October 31, 2024
+Simplify and automate the machine learning model lifecycle
+Tarek Oraby / September 18, 2024
+3 things to look forward to in MLOps (or maybe 4)
+Alexander Rozhkov / September 11, 2024
+Stop waiting for your training data to download (again)
+Tarek Oraby / September 04, 2024
+Solve the GPU shortage and control cloud costs: Valohai’s partnership with OVHcloud
+Toni Perämäki / August 28, 2024
+Save time and avoid recomputation with Pipeline Step Caching
+Tarek Oraby / August 20, 2024
+Platform +
+Solutions +
+Resources +
+Other +
+5/4/25, 8:58 PM The MLFlow-Airflow-Kubernetes Makeshift Monster: How Your DIY ML Stack Became Your Biggest Bottleneck
+https://valohai.com/blog/the-mlflow-airflow-kubernets-makeshift-monster/ 8/9
+Nobody Cares... +
+Featured Success Stories +
+Sign up to our newsletter
+Your work email
+© 2025 Valohai
+5/4/25, 8:58 PM The MLFlow-Airflow-Kubernetes Makeshift Monster: How Your DIY ML Stack Became Your Biggest Bottleneck
+https://valohai.com/blog/the-mlflow-airflow-kubernets-makeshift-monster/ 9/9
