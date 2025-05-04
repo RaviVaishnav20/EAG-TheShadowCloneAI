@@ -1,53 +1,64 @@
-from models import PerceptionInput, PerceptionOutput
-from llm import generate_text
+from pydantic import BaseModel
+from typing import Optional, List
+import os
+from dotenv import load_dotenv
+# from google import genai
+from llm import CustomLLM, CustomPayload
+import re
 from logger import get_logger
 
-#Get the instance of logger
 logger = get_logger()
-### ✅ System Prompt: Perception Generator
-system_prompt_perception = f"""
-**Role**: You are a *Perception Engine* responsible for interpreting user queries and transforming them into structured semantic representations that reflect intent, context, and meaning. You are the first stage in a cognitive pipeline, operating before memory, planning, or action execution.
 
-**Task**:  
-Given a raw natural language input from the user, generate a **perception** consisting of:
+load_dotenv()
 
-1. **Intent**: What does the user want to do or know?
-2. **Entities/Subjects**: Key people, objects, topics, or systems referenced.
-3. **Emotional Tone (if any)**: Is there an implied sentiment, urgency, or curiosity?
-4. **Contextual Clues**: Prior assumptions, implied background knowledge, or domain hints.
-5. **Query Type**: Is the query informational, instructional, conversational, or action-oriented?
-6. **Uncertainty or Ambiguity**: Flag anything unclear or under-specified.
-7. **Summary**: One-sentence abstract of the core meaning.
+# client = genai.Client(api_key=os.getenv("GEMINI_API_KEY"))
 
-**Rules**:
-- Be analytical, not assumptive. If information is missing, flag it.
-- Be domain-aware: interpret technical terms precisely.
-- Never paraphrase—**analyze**.
-- If the query is nonsensical or too vague, state that explicitly.
-- Output the result in **structured plain raw text** format.
+class PerceptionResult(BaseModel):
+    user_input: str
+    intent: Optional[str]
+    entities: List[str] = []
+    tool_hint: Optional[str] = None
 
-**Specialized Processing**:
-    - Use <think>...</think> tags for internal reasoning before responding
-"""
+async def extract_perception(user_input: str) -> PerceptionResult:
+    "Extract intent, entities, and tool hints using LLM"
 
+    prompt = f""" 
+                You are an AI that extracts structured facts from user input.
 
-async def extract_perception(message:PerceptionInput) ->  PerceptionOutput:
-    logger.info("Generating perception response...")
-    prompt = f"{system_prompt_perception} Query: {message.query}"
-    logger.debug(f"Full prompt length: {len(prompt)} characters")
+                Input: "{user_input}"
+
+                Return the response as a Python dictionary with keys:
+                - intent: (brief phrase about what the user wants)
+                - entities: a list of strings representing keywords or values (e.g., ["INDIA", "ASCII"])
+                - tool_hint: (name of the MCP tool that might be useful, if any else None)
+
+                Output only the dictionary on a single line. Do NOT wrap it in ```json or other formatting. Ensure `entities` is a list of strings, not a dictionary.
+            """
     try:
-        response = await generate_text(prompt)
-        response_text = response.text.strip()
-        logger.debug(type(response_text))
-        logger.info(f"Recieved perception response {len(response_text)} characters")
-        logger.info(f"Perception Response content: \n {response_text}")
-        return response_text
+        # response = client.models.generate_content(
+        #     model="gemini-2.0-flash",
+        #     contents=prompt
+        # )
+        custom_payload = CustomPayload(
+            prompt=prompt,
+        )
+        model = CustomLLM()
+        response = await model.invoke(custom_payload)
+        raw =response.strip()   #raw =response.text.strip()
+        logger.info(f"Perception, LLM output: {raw}")
 
+        clean = re.sub(r"^```json|```$","", raw.strip(), flags=re.MULTILINE).strip()
+
+        try:
+            parsed = eval(clean)
+        except Exception as e:
+            logger.error(f"Perception, ⚠️ Failed to parse cleaned output: {e}", exc_info=True)
+            raise
+        #Fix comman issues
+        if isinstance(parsed.get("entities"), dict):
+            parsed["entities"] = list(parsed["entities"].values())
+
+        return PerceptionResult(user_input=user_input, **parsed)
     except Exception as e:
-        logger.error(f"Failed to get LLM response: {e}", exc_info=True)
-        raise f"Failed to get LLM response: {e}"
-    
-
-# if __name__=="__main__":
-#     query = "Open Microsoft Paint, draw a rectangle, and add the text 'AI Agent Demo' inside the rectangle."
-#     extract_perception(query)
+        logger.error(f"perception, ⚠️ Extraction failed: {e}", exc_info=True)
+        return PerceptionResult(user_input=user_input)

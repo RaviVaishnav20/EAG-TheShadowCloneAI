@@ -56,7 +56,7 @@ async def main(user_input: str):
 
                             log("agent", f"{len(tools)} tools loaded")
 
-                            memory = MemoryManager()
+                            memory = MemoryManager() 
                             session_id = f"session-{int(time.time())}"
                             query = user_input  # Store original intent
                             step = 0

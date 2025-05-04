@@ -1,60 +1,100 @@
-import asyncio
-from google import genai
-from concurrent.futures import TimeoutError
-import os
-from dotenv import load_dotenv
-from logger import get_logger
-
-#Get the instance of logger
-logger = get_logger()
-# Load environment variables from .env file
-load_dotenv()
-
-# Access your API key and initialize Gemini client correctly
-api_key = os.getenv("GEMINI_API_KEY")
+from pydantic import BaseModel, Field
 
 
-async def generate_with_timeout(prompt, timeout=10):
-    """Generate content with a timeout"""
-    logger.info("Starting LLM generation...")
-    try:
-        client = genai.Client(api_key=api_key)
-        # Convert the synchronous generate_content call to run in a thread
-        loop = asyncio.get_event_loop()
-        logger.debug(f"Using model: gemini-2.0-flash, prompt size: {len(prompt)} chars")
-        response = await asyncio.wait_for(
-            loop.run_in_executor(
-                None, 
-                lambda: client.models.generate_content(
-                    model="gemini-2.0-flash",
-                    contents=prompt
-                )
-            ),
-            timeout=timeout
+class CustomPayload(BaseModel):
+    prompt: str = Field(default="")
+    max_tokens: int = Field(default=1000)
+    temperature: float = Field(default=0.9)
+    provider: str = Field(default="dolphin3")
+    top_p: float = Field(default=0.9)
+    domain: str = Field(default="general")
+    addition_system_prompt: str = Field(default="")
+
+
+
+import json
+import pprint
+import httpx
+import requests
+from env_config import env_config
+
+
+class CustomLLM:
+    """
+    A custom class to interact with Lambda Labs' AI layer API for invoking an LLM.
+
+    This class sends a request to the AI API with configurable parameters such as
+    max tokens, temperature, provider, top-p sampling, and additional prompts.
+    """
+
+    async def invoke(self, custom_payload: CustomPayload) -> str:
+        """
+        Asynchronously invokes the LLM with specified parameters and returns the response.
+
+        Parameters:
+        -----------
+        kwargs : dict
+            - max_tokens (int, optional): The maximum number of tokens to generate. Default is 1000.
+            - temperature (float, optional): Sampling temperature for randomness. Default is 0.7.
+            - provider (str, optional): Specifies the LLM provider. Default is "default".
+            - top_p (float, optional): Nucleus sampling parameter (between 0 and 1). Default is 0.9.
+            - domain (str, optional): The domain/context for the response. Default is "general".
+            - addition_system_prompt (str, optional): Additional system prompt for the model. Default is "".
+
+        Returns:
+        --------
+        str
+            The response from the AI model as a JSON string.
+
+        Raises:
+        -------
+        RuntimeError
+            If the API request fails due to an HTTP error or JSON decoding issue.
+
+        Example Usage:
+        -------------
+        ```python
+        llm = CustomLLM()
+        response = await llm.invoke(
+            max_tokens=1000,
+            temperature=0.7,
+            provider="bedrock",
+            top_p=0.9,
+            domain="general",
+            addition_system_prompt="",
         )
-        logger.info("LLM generation completed successfully")
-        return response
-    except TimeoutError:
-        logger.error(f"LLM generation timed out after {timeout} seconds!")
-        raise
-    except Exception as e:
-        logger.error(f"Error in LLM generation: {e}", exc_info=True)
-        raise
+        print(response)
+        ```
+        """
 
+        headers = {
+            "username": env_config.AI_LAYER_API_USERNAME,
+            "X-API-Key": env_config.AI_LAYER_API_KEY,
+        }
 
-async def generate_text(prompt):
-    """Generate content """
-    logger.info("Starting LLM generation...")
-    try:
-        client = genai.Client(api_key=api_key)
-        logger.debug(f"Using model: gemini-2.0-flash, prompt size: {len(prompt)} chars")
-        response =  client.models.generate_content(
-                    model="gemini-2.0-flash",
-                    contents=prompt
+        async with httpx.AsyncClient(timeout=20) as client:
+            try:
+
+                response = await client.post(
+                    env_config.AI_LAYER_API_BASE_URL,
+                    json=custom_payload.model_dump(),
+                    headers=headers,
                 )
-            
-        logger.info("LLM generation completed")
-        return response
-    except Exception as e:
-        logger.error(f"Error in LLM generation: {e}", exc_info=True)
-        raise
+
+                response.raise_for_status()
+                # print(response.json()["generated_text"])
+                return response.json()["generated_text"]
+            except (httpx.HTTPError, json.JSONDecodeError) as e:
+                raise RuntimeError(f"LLM Invoke Failed: {e}") from e
+        return ""
+    
+
+if __name__=="__main__":
+    import asyncio
+    custom_payload = CustomPayload(
+            prompt="Hi",
+        )
+    model = CustomLLM()
+    result = asyncio.run(model.invoke(custom_payload))
+    print(result)
+

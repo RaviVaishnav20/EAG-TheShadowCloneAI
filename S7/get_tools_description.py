@@ -39,7 +39,7 @@
 #         tools_description = "Error loading tools"
 #         raise f"Error creating tools description: {e}"
 
-def get_tools_prompt(tools):
+def get_description(tools):
     try:
         tools_description = []
         for i, tool in enumerate(tools):

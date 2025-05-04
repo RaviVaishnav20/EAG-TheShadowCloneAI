@@ -1,121 +1,129 @@
-# The Shadow Clone AI - System 6 (Modular Architecture)
+# 🚀 VectorDB Assistant – Chrome Extension
 
-This project implements an AI agent capable of performing mathematical computations, physics calculations, and visual diagramming tasks through a modular, well-organized architecture.
+Bring AI-powered memory to your browser.
 
-## Project Structure
+## 🔍 What is VectorDB Assistant?
 
-The system has been reorganized into clean, focused modules:
+VectorDB Assistant is a Chrome extension that helps you **capture, search, and interact** with the content you care about—using the power of semantic search and contextual AI.
 
-```
-S6/
-├── action.py            # Core action implementations and tool definitions
-├── config.py            # Server configuration
-├── decision_making.py   # Decision logic and LLM interaction
-├── llm.py               # LLM client and generation utilities
-├── logger.py            # Custom logging system with JSON output
-├── main.py              # Main execution loop and agent orchestration
-├── memory.py            # Short-term and long-term memory management
-├── models.py            # Pydantic models for type safety
-├── perception.py        # Query interpretation and analysis
-├── universal_system_prompt.py  # Core agent instruction set
-├── utils.py            # Utility functions (extract_function_call etc.)
-└── tool_prompt.py      # Tool description generator
-```
+### Key Highlights:
 
-## Key Improvements from Previous Version
+* 📝 **Save** text, full web pages, PDFs, or custom snippets to a vector database
+* 🔎 **Search** semantically across your saved content
+* 🤖 **Ask Nimo**, your AI assistant, to answer questions using your stored knowledge
 
-1. **Modular Architecture**:
-   - Separated concerns into distinct components
-   - Clear data flow between modules
-   - Better type safety with Pydantic models
+---
 
-2. **Enhanced Capabilities**:
-   - Added physics calculations (kinematics, energy, electricity)
-   - Improved Paint integration with text and shapes
-   - Advanced math operations (factorials, roots, trigonometry)
+## ✨ Features
 
-3. **Robust Infrastructure**:
-   - Comprehensive logging system
-   - Memory management (short-term and long-term)
-   - Error handling and validation
+### 📥 Save Content
 
-## Core Components
+* Save selected text via context menu
+* Capture entire web pages with one click
+* Upload and index PDF documents
+* Manually input custom text snippets
 
-### 1. Action Module (`action.py`)
-- Contains all executable tools including:
-  - Mathematical operations (basic and advanced)
-  - Physics calculations (displacement, projectile motion, energy)
-  - Paint integration (drawing, text)
-  - Special utilities (Fibonacci, ASCII conversion)
+### 🔍 Semantic Search
 
-### 2. Decision System (`decision_making.py`)
-- Orchestrates the THINK-VERIFY-ACT cycle
-- Interfaces with LLM for decision generation
-- Manages tool selection and parameter validation
+* AI-powered search across all your content
+* Adjustable result count
+* Relevance-based scoring for better answers
 
-### 3. Memory System (`memory.py`)
-- Short-term memory for operation context
-- SQLite-backed long-term memory (commented out but available)
-- Context preservation across iterations
+### 🤖 Ask Nimo
 
-### 4. LLM Integration (`llm.py`)
-- Gemini API client with timeout handling
-- Asynchronous generation support
-- Configurable via environment variables
+* Get intelligent answers using your saved data
+* Ask questions in natural language
+* Receive context-aware, helpful responses
 
-### 5. Utility Modules
-- `tool_prompt.py`: Generates tool descriptions for LLM context
-- `utils.py`: Contains helper functions like `extract_function_call`
-- `logger.py`: Custom logging with both console and JSON output
+---
 
-## Usage
+## ⚙️ Requirements
 
-1. Configure the system by setting up your `.env` file with Gemini API key
-2. Run the main agent:
-   ```bash
-   python main.py
-   ```
-3. The system will process the hardcoded query (can be modified in `main.py`)
+* Chrome browser (v88+)
+* Backend APIs:
 
-## Example Workflows
+  * **VectorDB API** (`http://localhost:8000`)
+  * **Nimo Agent API** (`http://localhost:8002`)
 
-### Physics Calculation:
-```python
-"A 1200 kg car braking at -8 m/s² for 3 seconds before hitting a barrier. 
-What was its initial kinetic energy and how far did it travel during braking?"
-```
+---
 
-### Visual Task:
-```python
-"Open Microsoft Paint, draw a rectangle, and add the text 'AI Agent Demo' above the rectangle."
-```
+## 🧰 Installation
 
-## Configuration
+1. **Clone** or **download** this repository
+2. Open Chrome and navigate to `chrome://extensions/`
+3. Toggle on **Developer Mode** (top-right)
+4. Click **Load unpacked**, then select the project folder
 
-Edit `config.py` to:
-- Set server file path
-- Configure command type
+---
 
-## Dependencies
+## 🔧 Backend Setup
 
-- Python 3.8+
-- Required packages:
-  - `mcp`
-  - `pywinauto`
-  - `win32gui`
-  - `Pillow`
-  - `pydantic`
-  - `google-generativeai`
+### 🧠 VectorDB API
 
-Install with:
-```bash
-pip install -r requirements.txt
+Required endpoints:
+
+* `POST /ingest/text` — Save text
+* `POST /ingest/pdf` — Save PDF
+* `POST /ingest/url` — Save URL
+* `POST /search` — Semantic search
+* `GET /health` — Health check
+
+### 🗨️ Nimo Agent API
+
+Required endpoint:
+
+* `POST /agent` — Ask questions, get answers
+
+---
+
+## 🚀 Usage Guide
+
+1. Click the extension icon in Chrome
+2. Use tabs to navigate:
+
+   * **Save**: Add text, PDFs, or current URL
+   * **Search**: Explore saved content
+   * **Ask Nimo**: Interact with your AI assistant
+
+### Right-Click Menu
+
+Easily save selected text via **"Save selection to VectorDB"** in the context menu.
+
+---
+
+## ⚙️ Configuration
+
+Update API endpoints in `popup.js` if needed:
+
+```js
+const API_ENDPOINTS = {
+  ingestText: 'http://localhost:8000/ingest/text',
+  ingestPdf: 'http://localhost:8000/ingest/pdf',
+  ingestUrl: 'http://localhost:8000/ingest/url',
+  search: 'http://localhost:8000/search',
+  askNimo: 'http://localhost:8002/agent'
+};
 ```
 
-## Future Enhancements
+---
 
-1. Implement full long-term memory persistence
-2. Add more physics and engineering calculations
-3. Expand visual toolkit with additional shapes and effects
-4. Implement interactive mode for user queries
-```
+## 🛠 Troubleshooting
+
+* **APIs not responding?**
+  → Check that both services are running and review browser console logs
+
+* **Permission issues?**
+  → Confirm `manifest.json` includes correct host permissions
+
+* **Save failures?**
+  → Inspect backend logs or check for data limits
+
+---
+
+## 👨‍💻 Development Workflow
+
+1. Modify code as needed
+2. Go to `chrome://extensions/`
+3. Hit **Refresh** on your extension card to reload
+
+

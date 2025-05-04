@@ -1,6 +1,45 @@
-from pydantic import BaseModel
-from typing import List, Union, Optional
+from pydantic import BaseModel, Field
+from typing import List, Dict, Any, Optional, Union
+# -------------------------------
+# RAG
+# -------------------------------
+# Define input and output models
+# Define input model
+# class SearchQueryInput(BaseModel):
+#     """Search query parameters"""
+#     query: str = Field(..., description="The search query text")
+#     top_k: int = Field(5, description="Maximum number of results to return")
+#     include_context: bool = Field(True, description="Whether to include text chunks in results")
+#     min_score: float = Field(0.0, description="Minimum similarity score threshold")
 
+# Wrapper model that follows the expected tool input format
+# class SearchQuery(BaseModel):
+#     input_data: SearchQueryInput
+
+# Define output models
+class SearchResult(BaseModel):
+    """Single search result"""
+    doc_id: str
+    title: str
+    chunk: str
+    chunk_id: str
+    score: float
+    rank: int
+    source_type: str
+    url: Optional[str] = None
+
+class SearchResponse(BaseModel):
+    """Search response containing results"""
+    results: List[SearchResult]
+    query: str
+    total_results: int
+    
+class SearchDocumentInput(BaseModel):
+    query: str
+
+# class SearchDocumentOutput(BaseModel):
+#     result: List[str]
+    
 # -------------------------------
 # Core Models
 # -------------------------------
@@ -103,46 +142,18 @@ class DopplerShiftInput(BaseModel):
 # -------------------------------
 # Image/Visual Operations
 # -------------------------------
-class ImagePathInput(BaseModel):
-    image_path: str
 
-class RectangleInput(BaseModel):
-    x1: int
-    y1: int
-    x2: int
-    y2: int
-
-class TextPositionInput(BaseModel):
-    text: str
-    x1: int
-    y1: int
 
 # -------------------------------
 # System Models
 # -------------------------------
 #Perception
-class PerceptionInput(BaseModel):
-    query: str
-
-class PerceptionOutput(BaseModel):
-    result: str
 
 #Memory
-class GetSTMemoryInput(BaseModel):
-    key: str
 
-class GetSTMemoryOutput(BaseModel):
-    result: str
-
-class UpdateSTMemoryInput(BaseModel):
-    key: str
-    value: str
 
 #Decision
-class DECISION_INPUT(BaseModel):
-    query: str
-    chat_history: str
-    tools_description: str
+
 
 # Specific conversion operations
 class StringToCharsInput(BaseModel):

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VectorDB Assistant</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <h1>VectorDB Assistant</h1>
+    
+    <div class="tabs">
+      <button id="saveTabBtn" class="tab-btn active">Save</button>
+      <button id="searchTabBtn" class="tab-btn">Search</button>
+      <button id="askNimoTabBtn" class="tab-btn">Ask Nimo</button>
+    </div>
+    
+    <div id="saveTab" class="tab-content active">
+      <h2>Save to Vector DB</h2>
+      
+      <div class="input-group">
+        <label>Save as:</label>
+        <div class="option-group">
+          <div class="option">
+            <input type="radio" id="optionText" name="saveOption" value="text" checked>
+            <label for="optionText">Text</label>
+          </div>
+          <div class="option">
+            <input type="radio" id="optionPdf" name="saveOption" value="pdf">
+            <label for="optionPdf">PDF</label>
+          </div>
+          <div class="option">
+            <input type="radio" id="optionUrl" name="saveOption" value="url">
+            <label for="optionUrl">Current URL</label>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Text Input Box (shown by default) -->
+      <div id="textInputSection" class="input-section">
+        <div class="input-group">
+          <label for="textTitle">Title:</label>
+          <input type="text" id="textTitle" placeholder="Enter a title for this content">
+        </div>
+        <div class="input-group">
+          <label for="textContent">Content:</label>
+          <textarea id="textContent" placeholder="Paste your text here"></textarea>
+        </div>
+      </div>
+      
+      <!-- PDF Upload Section (hidden by default) -->
+      <div id="pdfInputSection" class="input-section hidden">
+        <div class="input-group">
+          <label for="pdfTitle">Title:</label>
+          <input type="text" id="pdfTitle" placeholder="Enter a title for this PDF">
+        </div>
+        <div class="input-group">
+          <label for="pdfFile">Select PDF:</label>
+          <input type="file" id="pdfFile" accept=".pdf">
+        </div>
+      </div>
+      
+      <!-- URL Section (hidden by default) -->
+      <div id="urlInputSection" class="input-section hidden">
+        <div class="input-group">
+          <label for="urlTitle">Title (optional):</label>
+          <input type="text" id="urlTitle" placeholder="Leave blank to use page title">
+        </div>
+        <div class="input-group">
+          <label>Current URL:</label>
+          <div id="currentUrl" class="url-display">https://...</div>
+        </div>
+      </div>
+      
+      <button id="saveBtn" class="primary-btn">Save to VectorDB</button>
+      <div id="saveStatus" class="status"></div>
+    </div>
+    
+    <div id="searchTab" class="tab-content">
+      <h2>Search Vector DB</h2>
+      
+      <div class="input-group">
+        <label for="searchQuery">Search Query:</label>
+        <input type="text" id="searchQuery" placeholder="Enter your search query">
+      </div>
+      
+      <div class="input-group">
+        <label for="resultCount">Number of results:</label>
+        <input type="number" id="resultCount" min="1" max="20" value="5">
+      </div>
+      
+      <button id="searchBtn" class="primary-btn">Search</button>
+      
+      <div id="searchStatus" class="status"></div>
+      
+      <div id="searchResults" class="results-container">
+        <!-- Search results will be displayed here -->
+      </div>
+    </div>
+    
+    <div id="askNimoTab" class="tab-content">
+      <h2>Ask Nimo</h2>
+      
+      <div class="input-group">
+        <label for="nimoQuery">Your Question:</label>
+        <input type="text" id="nimoQuery" placeholder="Ask Nimo anything...">
+      </div>
+      
+      <button id="askNimoBtn" class="primary-btn">Ask Nimo</button>
+      
+      <div id="nimoStatus" class="status"></div>
+      
+      <div id="nimoResults" class="results-container">
+        <!-- Nimo results will be displayed here -->
+      </div>
+    </div>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>

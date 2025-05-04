@@ -18,7 +18,7 @@ class MemoryItem(BaseModel):
     session_id: Optional[str] = None
 
 
-class MemoryManager:
+class MemoryManager: 
     def __init__(self, embedding_model_url="http://localhost:11434/api/embeddings", model_name="nomic-embed-text"):
         self.embedding_model_url = embedding_model_url
         self.model_name = model_name
