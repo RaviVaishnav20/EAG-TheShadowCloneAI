@@ -1,0 +1,66 @@
+{
+    "defaults": {
+      "text_generation": "gemini",
+      "embedding": "nomic"
+    },
+    "models": {
+      "ai-layer": {
+        "type": "endpoint",
+        "username": "AI_LAYER_API_USERNAME",
+        "api_key_env": "AI_LAYER_API_KEY",
+        "url": {
+          "generate": {
+            "url": "AI_LAYER_GENERATE_URL",
+            "max_tokens": 100,
+            "provider": "bedrock",
+            "temperature": 0.3,
+            "top_p": 0.95,
+            "domain": "custom",
+            "addition_system_prompt": ""
+          },
+          "embed": {
+            "url": "AI_LAYER_EMBEDDING_URL",
+            "provider": "huggingface",
+            "output_dim": 768
+          }
+        }
+      },
+      "gemini": {
+        "type": "gemini",
+        "model": "gemini-2.0-flash",
+        "embedding_model": "models/embedding-001",
+        "api_key_env": "GEMINI_API_KEY"
+      },
+      "aws_bedrock": {
+        "type": "bedrock",
+        "model": "BEDROCK_MODEL_ID",
+        "aws_secret_key": "AWS_SECRET_KEY",
+        "aws_access_key": "AWS_ACCESS_KEY",
+        "aws_region": "AWS_REGION"
+      },
+      "phi4": {
+        "type": "ollama",
+        "model": "phi4",
+        "embedding_model": "phi4",
+        "url": {
+          "generate": "http://localhost:11434/api/generate",
+          "embed": "http://localhost:11434/api/embeddings"
+        }
+      },
+      "gemma3:12b": {
+        "type": "ollama",
+        "model": "gemma3:12b",
+        "embedding_model": "gemma3:12b",
+        "url": {
+          "generate": "http://localhost:11434/api/generate",
+          "embed": "http://localhost:11434/api/embeddings"
+        }
+      },
+      "nomic": {
+        "type": "huggingface",
+        "model": "nomic-ai/nomic-embed-text-v1",
+        "embedding_dimension": 768
+      }
+    }
+  }
+  

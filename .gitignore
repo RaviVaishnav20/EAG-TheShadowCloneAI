@@ -114,3 +114,5 @@ config.js
 
 logs.json
 env_config.py
+__MACOSX
+.DS_Store
